@@ -1,11 +1,15 @@
 <?php
 
 namespace App\Model;
+use App\User;
 
 use Illuminate\Database\Eloquent\Model;
 
+
 class Reply extends Model
 {
+    protected $guarded = [];
+
     public function question()
     {
     	return $this->belongsTo(Question::class);
@@ -16,7 +20,7 @@ class Reply extends Model
     	return $this->belongsTo(User::class);
     }
 
-    public function like()
+    public function likes()
     {
     	return $this->hasMany(Like::class);
     }
