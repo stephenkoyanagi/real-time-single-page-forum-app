@@ -4,6 +4,8 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class Handler extends ExceptionHandler
 {
@@ -46,6 +48,19 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if($exception instanceOf TokenBlackListedException) {
+            return response(['error'=>'Token cannot be used, get new one'],
+                Response::HTTP_BAD_REQUEST);
+        } else if($exception instanceOf TokenInvalidException) {
+            return response(['error'=>'Token is invalid'],
+                Response::HTTP_BAD_REQUEST);
+        } else if($exception instanceOf TokenExpiredException) {
+            return response(['error'=>'Token is expired'],
+                Response::HTTP_BAD_REQUEST);
+        } else if($exception instanceOf JWTException) {
+            return response(['error'=>'Token is not provided'],
+                Response::HTTP_BAD_REQUEST);
+        }
         return parent::render($request, $exception);
     }
 }
