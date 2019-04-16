@@ -1,6 +1,8 @@
 <template>
 	<v-container>
+		
 		<v-form @submit.prevent="submit">
+			<span class="red--text" v-if="errors.name">{{errors.name[0]}}</span>
 	   		<v-text-field
         		v-model="form.name"          
         		label="Category Name"
@@ -8,8 +10,8 @@
         		required
       		></v-text-field>
 
-      		<v-btn type="submit" color="teal" v-if="editSlug">Update</v-btn>
-      		<v-btn type="submit" color="teal" v-else>Create</v-btn>
+      		<v-btn type="submit" :disabled="disabled" color="teal" v-if="editSlug">Update</v-btn>
+      		<v-btn type="submit" :disabled="disabled" color="teal" v-else>Create</v-btn>
       		
 		</v-form>
 
@@ -56,7 +58,8 @@
 					name:null
 				},
 				categories: {},
-				editSlug:null
+				editSlug:null,
+				errors:{}
 			}
 		},
 		created() {
@@ -65,6 +68,7 @@
 			}
 			axios.get('/api/category')
 			.then(res => this.categories = res.data.data)
+			.catch(error => this.errors = error.response.data.errors)
 		},
 		methods: {
 			submit() {
@@ -85,7 +89,7 @@
 					this.categories.unshift(res.data)
 					this.form.name = null
 				})
-				.catch(error => console.log(error.response.data))
+				.catch(error => this.errors = error.response.data.errors)
 			},
 			update() {
 				axios.patch(`/api/category/${this.editSlug}`, this.form)
@@ -94,7 +98,12 @@
 					this.form.name = null
 					this.editSlug = null
 				})
-				.catch(error => console.log(error.response.data))
+				.catch(error => this.errors = error.response.data.errors)
+			}
+		},
+		computed: {
+			disabled() {
+				return !(this.form.name)
 			}
 		}
 
